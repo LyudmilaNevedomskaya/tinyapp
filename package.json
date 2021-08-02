@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/LyudmilaNevedomskaya/tinyapp/issues"
   },
-  "homepage": "https://github.com/LyudmilaNevedomskaya/tinyapp#readme"
+  "homepage": "https://github.com/LyudmilaNevedomskaya/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
