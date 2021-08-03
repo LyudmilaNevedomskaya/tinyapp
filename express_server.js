@@ -14,7 +14,7 @@ function generateRandomString(length, chars) {
   for (let i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
   return result;
 }
-let rString = generateRandomString(6, '0123456789abcdefghijklmnopqrstuvwxyz');
+// // let rString = generateRandomString(6, '0123456789abcdefghijklmnopqrstuvwxyz');
 
 
 const urlDatabase = {
@@ -53,22 +53,25 @@ app.get('/', (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  urlDatabase[rString] = req.body.longURL
-  console.log(urlDatabase);
+  const newHTTP = req.body.longURL;
+  const shortURL = generateRandomString(6, '0123456789abcdefghijklmnopqrstuvwxyz');
+
+  urlDatabase[shortURL] = newHTTP;
+  //console.log(urlDatabase);
   //console.log(req.body);  // Log the POST request body to the console
   //res.send("Ok");         // Respond with 'Ok' (we will replace this)
-  res.redirect(`/urls/${rString}`)
+  res.redirect(`/urls/${shortURL}`)
 });
 
  app.get('/urls/:shortURL', (req, res) => {
   const templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
-  console.log(templateVars);
+  //console.log(templateVars);
   res.render('urls_show', templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
-
-  const longURL = urlDatabase[rString];
+  const shortURL = req.params.shortURL
+  const longURL = urlDatabase[shortURL];
   res.redirect(longURL);
 });
 
