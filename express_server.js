@@ -8,16 +8,13 @@ app.set('view engine', 'ejs');
 
 app.use(express.urlencoded({extended: true}));
 
-function generateRandomString() {
-
-}
 
 function generateRandomString(length, chars) {
-  var result = '';
-  for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+  let result = '';
+  for (let i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
   return result;
 }
-var rString = generateRandomString(6, '0123456789abcdefghijklmnopqrstuvwxyz');
+let rString = generateRandomString(6, '0123456789abcdefghijklmnopqrstuvwxyz');
 
 
 const urlDatabase = {
@@ -29,22 +26,22 @@ app.get('/', (req, res) => {
   res.send('Hello!!!');
 });
 
-app.get('/urls.json', (req, res) => {
-  res.json(urlDatabase);
-});
+// app.get('/urls.json', (req, res) => {
+//   res.json(urlDatabase);
+// });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
+// app.get("/hello", (req, res) => {
+//   res.send("<html><body>Hello <b>World</b></body></html>\n");
+// });
 
-app.get("/set", (req, res) => {
-  const a = 1;
-  res.send(`a = ${a}`);
- });
+// app.get("/set", (req, res) => {
+//   const a = 1;
+//   res.send(`a = ${a}`);
+//  });
  
- app.get("/fetch", (req, res) => {
-  res.send(`a = ${a}`);
- });
+//  app.get("/fetch", (req, res) => {
+//   res.send(`a = ${a}`);
+//  });
 
  app.get('/urls', (req, res) => {
    const templateVars = {urls: urlDatabase};
@@ -56,13 +53,23 @@ app.get("/set", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  urlDatabase[rString] = req.body.longURL
+  console.log(urlDatabase);
+  //console.log(req.body);  // Log the POST request body to the console
+  //res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  res.redirect(`/urls/${rString}`)
 });
 
  app.get('/urls/:shortURL', (req, res) => {
   const templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
+  console.log(templateVars);
   res.render('urls_show', templateVars);
+});
+
+app.get("/u/:shortURL", (req, res) => {
+
+  const longURL = urlDatabase[rString];
+  res.redirect(longURL);
 });
 
 app.listen(PORT, () => {
