@@ -21,10 +21,10 @@
     <div class="card-header"></div>
     <div class="card-body">
       <h3>Edit</h3>
-      <form action="/urls" method="POST" >
-        <label for="longURL">New URL:</label>
+      <form method="POST" action="/urls/<%= shortURL%>">
+        <label>New URL:</label>
           <input class="form-control" type="text" name="longURL" value="<%=longURL%>" style="width: 300px; margin: 1em">
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="submit" class="btn btn-outline-primary"> Submit </button>
       </form>
     </div>
   <div class="card-footer text-muted"></div>
@@ -35,3 +35,4 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 </body>
 </html>
+
