@@ -51,9 +51,9 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
   let agree = false;
   let userID = findUserID(req.body.email, req.body.password, users);
-  console.log(userID);
-  agree = findUser(req.body.email, req.body.password, users);
-  console.log(agree, userID);
+  //console.log(userID);
+  agree = findUser(req.body.email, users);
+  //console.log(agree, userID);
 
   if (agree) {
     res.cookie('user_id', users[userID].id)
@@ -72,15 +72,7 @@ app.get('/register', (req, res) => {
 })
 //Create a Registration Handler
 app.post ('/register', (req, res) => {
-      // const userRandomID = generateRandomString(6, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
-      // users[userRandomID] = {id: userRandomID, email: req.body.email, password: req.body.password}
-      // //console.log(users);
-      // res.cookie('user_id', users[userRandomID].id)
-      // res.redirect('/urls')
-    
-  
-
-  console.log(req.body.email);
+  //console.log(req.body.email);
   let isEmail = false;
   isEmail = findUser(req.body.email, users)
   if ((req.body.email === '' || req.body.password === '') || isEmail) {
@@ -91,7 +83,7 @@ app.post ('/register', (req, res) => {
   else {
       const userRandomID = generateRandomString(6, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
       users[userRandomID] = {id: userRandomID, email: req.body.email, password: req.body.password}
-      console.log(users);
+      //console.log(users);
       res.cookie('user_id', users[userRandomID].id)
       res.redirect('/urls')
     }
@@ -156,7 +148,7 @@ app.post('/urls/:shortURL', (req, res) => {
 
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
-  res.redirect('/urls');
+  res.redirect('/login');
 });
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
