@@ -15,7 +15,7 @@
     </div>
 
    
-      <%if (!user) {%>
+      <%if (!user_id) {%>
       <form class="d-flex" method="GET" action="/login">
         <!-- <input class="form-control me-2" type="text" placeholder="Username" name="username"> -->
         <button class="btn btn-outline-dark" type="submit">Login</button>
@@ -27,7 +27,7 @@
 
       <%} else {%>
         <form class="d-flex" method="POST" action="/logout">
-          <label>Logged in as: <%= user.email%></label>
+          <label style="margin: 1em;">Logged in as:   <%= user.email%></label>
           <button class="btn btn-outline-dark" type="submit">Logout</button>
         </form>
       <%}%>
