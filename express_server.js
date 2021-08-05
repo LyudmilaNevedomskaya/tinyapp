@@ -2,7 +2,8 @@ const express = require('express');
 const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
-var cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
 
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({extended: true}));
@@ -24,17 +25,6 @@ const users = {
 }
 };
 
-// const urlsForUser = function(id, users) {
-//   let currentUserUrls = []
-//   for(let i in users){
-//     if(users[i]===id){
-//       carentUser[i]=users[i][id]
-//     }
-//   }
-//   return currentUserUrls;
-// }
-
-
 const findUser = function(email, passw, usersObject) {
   for (user in usersObject) {
     if (usersObject[user].email === email && usersObject[user].password === passw) {
@@ -49,7 +39,7 @@ const findUserID = function(email, usersObject) {
     } 
   } 
 }
-let newBase = {}
+//let newBase = {}
 
 const urlDatabase = {
   // "b2xVn2": "http://www.lighthouselabs.ca",
@@ -61,13 +51,26 @@ app.get('/login', (req, res) => {
 })
 
 app.post('/login', (req, res) => {
-  let agree = false;
+  //let agree = false;
   let userID = findUserID(req.body.email, users);
-  agree = findUser(req.body.email, req.body.password, users);
+  console.log('userID:', userID);
+  //agree = findUser(req.body.email, req.body.password, users);
 
-  if (agree) {
-    res.cookie('user_id', users[userID].id)
-    res.redirect('/urls')
+  const password = req.body.password;
+
+
+  if (userID==users[userID].id) {
+    console.log("yessssssssssssss");
+
+    bcrypt.compare(password, users[userID].password)
+      .then((result) => {
+        if (result) {
+          res.cookie('user_id', users[userID].id)
+          res.redirect('/urls')
+        } else {
+          return res.status(401).send('Password incorrect')
+        }
+      })
   } else {
     res.redirect('/login')
   }
@@ -77,14 +80,17 @@ app.post('/login', (req, res) => {
 app.get('/register', (req, res) => {
   res.render('register')
 })
-//Create a Registration Handler
+//REGISTER
 app.post ('/register', (req, res) => {
-  let user = findUserID(req.body.email, users)
-  console.log(user);
+  let user = findUserID(req.body.email, users);
+  //console.log(user);
   if (user === undefined) {
-    const userRandomID = generateRandomString(6, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
-      users[userRandomID] = {id: userRandomID, email: req.body.email, password: req.body.password}
+    const password = req.body.password;
+    const hashedPassword = bcrypt.hashSync(password, 10);
 
+    const userRandomID = generateRandomString(6, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+      users[userRandomID] = {id: userRandomID, email: req.body.email, password: hashedPassword}
+    console.log(users);
       res.cookie('user_id', users[userRandomID].id)
       res.redirect('/urls')
       return
@@ -95,9 +101,12 @@ app.post ('/register', (req, res) => {
   } 
 
   else {
+    const username = req.body.email;
+    const password = req.body.password;
+    const hashedPassword = bcrypt.hashSync(password, 10);
+
       const userRandomID = generateRandomString(6, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
-      users[userRandomID] = {id: userRandomID, email: req.body.email, password: req.body.password}
-      //console.log(users);
+      users[userRandomID] = {id: userRandomID, email: req.body.email, password: hashedPassword}
       res.cookie('user_id', users[userRandomID].id)
       res.redirect('/urls')
     }
@@ -132,10 +141,7 @@ app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(6, '0123456789abcdefghijklmnopqrstuvwxyz');
 
   urlDatabase[req.cookies['user_id']] = {...urlDatabase[req.cookies['user_id']],[shortURL]: newHTTP};
-
-  
-
-  //newBase[shortURL]={[req.cookies['user_id']]:newHTTP}
+ //newBase[shortURL]={[req.cookies['user_id']]:newHTTP}
   console.log(urlDatabase);
   res.redirect(`/urls/${shortURL}`)
 });
