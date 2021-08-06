@@ -35,6 +35,8 @@ const urlDatabase = {
   // "b2xVn2": "http://www.lighthouselabs.ca",
   // "9sm5xK": "http://www.google.com",
 };
+
+//HOME page
 app.get('/', (req, res) => {
   res.render('login');
 });
@@ -44,15 +46,16 @@ app.get('/login', (req, res) => {
   res.render('login');
 });
 
+// User logs in 
 app.post('/login', (req, res) => {
   let userID = findUserID(req.body.email, users);
   //const email = req.body.email;
   const password = req.body.password;
-
+// check if user already exists in users database
   if (!userID) {
     return res.status(400).send('Invalid Login! Please <a href= "/login"> try again </a>  or go to the <a href= "/register"> register </a> page');
   }
-
+// if user was found in database, check the saved password with inputted password
   if (userID == users[userID].id) {
 
     bcrypt.compare(password, users[userID].password)
@@ -61,6 +64,7 @@ app.post('/login', (req, res) => {
           //res.cookie('user_id', users[userID].id)
           req.session.user_id = users[userID].id;
           res.redirect('/urls');
+          // if passwords are not matched, send an error
         } else {
           return res.status(401).send('Password is incorrect!!! Please <a href= "/login"> try again </a>');
         }
@@ -74,14 +78,18 @@ app.post('/login', (req, res) => {
 app.get('/register', (req, res) => {
   res.render('register');
 });
-//REGISTER
+
+//New User Registration
 app.post('/register', (req, res) => {
   let user = findUserID(req.body.email, users);
 
+
+  // if email and password are not entered
   if (req.body.email === '' || req.body.password === '') {
     return res.status(401).send('Missing EMAIL or PASSWORD. Please <a href= "/register"> try again </a>');
   }
 
+  // check if the user is in the database, and create new user
   if (user === undefined) {
     const password = req.body.password;
     const hashedPassword = bcrypt.hashSync(password, 10);
@@ -95,10 +103,11 @@ app.post('/register', (req, res) => {
     res.redirect('/urls');
     return;
   }
+  // if user already registered with given email, send an error
   if (users[user].email === req.body.email) {
     return res.status(401).send('Email already exists!!! Please <a href= "/register"> try again </a> or <a href= "/login"> Log in </a> ');
   } else {
-    //const username = req.body.email;
+    // create new user
     const password = req.body.password;
     const hashedPassword = bcrypt.hashSync(password, 10);
 
@@ -113,6 +122,9 @@ app.post('/register', (req, res) => {
   }
 });
 
+// move user to apropriate page
+// if new user => move to a clean page
+// if exists user => move to the page with his/her urlDatabase
 app.get('/urls', (req, res) => {
   let k = req.session.user_id;
   if (!k) {
@@ -131,6 +143,7 @@ app.get('/urls', (req, res) => {
   }
 });
 
+// the page for creating new urls
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     user_id: req.session.user_id,
@@ -162,9 +175,10 @@ app.get('/urls/:shortURL', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
+// If you click on shortURL, you will redirect to your created URL
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
+  const longURL = urlDatabase[req.session.user_id][shortURL];
   res.redirect(longURL);
 });
 
